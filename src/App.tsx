@@ -2,7 +2,7 @@ import  { useState, useEffect } from 'react';
 import { GoogleAuth } from './components/GoogleAuth';
 import { Sidebar } from './components/Sidebar';
 import { EmailList } from './components/EmailList';
-import { EmailViewer } from './components/EmailViewer';
+import {EmailViewer}  from './components/EmailViewer';
 import { RemindersList } from './components/RemindersList';
 import { GmailService, type GmailMessage, type PaginatedEmailResponse } from './lib/gmail';
 import { GeminiService, type EmailSummary } from './lib/gemini';
@@ -230,40 +230,52 @@ function App() {
 
     return (
         <div className="flex h-screen bg-white">
-            <Sidebar
-                activeView={activeView}
-                onViewChange={setActiveView}
-                onSignOut={handleSignOut}
-                reminderCount={reminders.filter(r => !r.is_completed).length}
-            />
-
-            {activeView === 'inbox' ? (
-                <>
-                    <EmailList
-                        emails={emails}
-                        selectedIndex={selectedEmailIndex}
-                        onSelectEmail={setSelectedEmailIndex}
-                        reminders={reminders}
-                        hasMoreEmails={hasMoreEmails}
-                        isLoadingEmails={isLoadingEmails}
-                        onLoadMore={loadMoreEmails}
-                        onRefresh={refreshEmails}
-                        currentPage={currentPage}
-                        totalEmailsEstimate={totalEmailsEstimate}
-                        emailsPerPage={emailsPerPage}
-                    />
-                    <EmailViewer
-                        email={emails[selectedEmailIndex]}
-                        onGenerateSummary={handleGenerateSummary}
-                        onCreateReminder={handleCreateReminder}
-                    />
-                </>
-            ) : (
-                <RemindersList
-                    reminders={reminders}
-                    onCompleteReminder={handleCompleteReminder}
-                    onViewEmail={handleViewEmail}
+            {/* Sidebar - Fixed width, never moves */}
+            <div className="flex-shrink-0 w-64 border-r border-gray-200">
+                <Sidebar
+                    activeView={activeView}
+                    onViewChange={setActiveView}
+                    onSignOut={handleSignOut}
+                    reminderCount={reminders.filter(r => !r.is_completed).length}
                 />
+            </div>
+    
+            {activeView === 'inbox' ? (
+                <div className="flex flex-1 h-full">
+                    {/* EmailList - Fixed 35% width */}
+                    <div className="w-[35%] min-w-[150px] max-w-[320px] flex-shrink-0 border-r border-gray-200">
+                        <EmailList
+                            emails={emails}
+                            selectedIndex={selectedEmailIndex}
+                            onSelectEmail={setSelectedEmailIndex}
+                            reminders={reminders}
+                            hasMoreEmails={hasMoreEmails}
+                            isLoadingEmails={isLoadingEmails}
+                            onLoadMore={loadMoreEmails}
+                            onRefresh={refreshEmails}
+                            currentPage={currentPage}
+                            totalEmailsEstimate={totalEmailsEstimate}
+                            emailsPerPage={emailsPerPage}
+                        />
+                    </div>
+                    
+                    {/* EmailViewer - Takes remaining width */}
+                    <div className="">
+                        <EmailViewer
+                            email={emails[selectedEmailIndex]}
+                            onGenerateSummary={handleGenerateSummary}
+                            onCreateReminder={handleCreateReminder}
+                        />
+                    </div>
+                </div>
+            ) : (
+                <div className="flex-1 h-full">
+                    <RemindersList
+                        reminders={reminders}
+                        onCompleteReminder={handleCompleteReminder}
+                        onViewEmail={handleViewEmail}
+                    />
+                </div>
             )}
         </div>
     );

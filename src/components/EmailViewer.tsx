@@ -25,21 +25,255 @@ export const EmailViewer: React.FC<EmailViewerProps> = ({
   const [showReminderDialog, setShowReminderDialog] = useState(false);
   const [reminderTime, setReminderTime] = useState('1h');
   const [reminderCreated, setReminderCreated] = useState(false);
-  const [showImages, setShowImages] = useState(false);
+  const [showImages, setShowImages] = useState(true);
   const [processedContent, setProcessedContent] = useState<string>('');
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Enhanced CSS styles for direct HTML rendering
+  const emailContentStyles = `
+    .email-content-display {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #333;
+      max-width: 80%;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .email-content-display * {
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .email-content-display h1, 
+    .email-content-display h2, 
+    .email-content-display h3, 
+    .email-content-display h4, 
+    .email-content-display h5, 
+    .email-content-display h6 {
+      margin: 1.2em 0 0.5em 0;
+      font-weight: 600;
+      line-height: 1.3;
+      color: #1a1a1a;
+    }
+
+    .email-content-display h1 { font-size: 1.8em; }
+    .email-content-display h2 { font-size: 1.5em; }
+    .email-content-display h3 { font-size: 1.3em; }
+    .email-content-display h4 { font-size: 1.1em; }
+    .email-content-display h5 { font-size: 1em; }
+    .email-content-display h6 { font-size: 0.9em; }
+
+    .email-content-display p {
+      margin: 0.8em 0;
+      line-height: 1.6;
+    }
+
+    .email-content-display a {
+      color: #0066cc !important;
+      text-decoration: none !important;
+      word-break: break-all !important;
+      overflow-wrap: break-word !important;
+      transition: all 0.2s ease;
+    }
+
+    .email-content-display a:hover {
+      color: #004499 !important;
+      text-decoration: underline !important;
+      background-color: rgba(0, 102, 204, 0.1);
+      padding: 2px 4px;
+      border-radius: 3px;
+      margin: -2px -4px;
+    }
+
+    .email-content-display a[href*="linkedin.com"],
+    .email-content-display a[href*="tracking"],
+    .email-content-display a[href*="utm_"],
+    .email-content-display a[href*="?"] {
+      word-break: break-all !important;
+      overflow-wrap: anywhere !important;
+      font-size: 0.9em;
+      background-color: #f8f9fa;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #e0e0e0;
+      margin: 2px 0;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    .email-content-display img {
+      max-width: 100% !important;
+      height: auto !important;
+      display: block;
+      margin: 10px 0;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .email-content-display table {
+      width: 100% !important;
+      max-width: 100% !important;
+      border-collapse: collapse;
+      margin: 15px 0;
+      background-color: white;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .email-content-display th,
+    .email-content-display td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+    }
+
+    .email-content-display th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .email-content-display ul,
+    .email-content-display ol {
+      margin: 10px 0;
+      padding-left: 25px;
+    }
+
+    .email-content-display li {
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+
+    .email-content-display blockquote {
+      margin: 15px 0;
+      padding: 10px 15px;
+      border-left: 4px solid #0066cc;
+      background-color: #f8f9fa;
+      border-radius: 0 4px 4px 0;
+      font-style: italic;
+      color: #555;
+    }
+
+    .email-content-display pre {
+      background-color: #f4f4f4;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      overflow-x: auto;
+      margin: 15px 0;
+      font-family: 'Courier New', Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .email-content-display code {
+      background-color: #f4f4f4;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: 'Courier New', Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .email-content-display iframe {
+      max-width: 100% !important;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      margin: 15px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .email-content-display div {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .email-content-display hr {
+      border: none;
+      border-top: 2px solid #e0e0e0;
+      margin: 20px 0;
+    }
+
+    .email-content-display .gmail_quote,
+    .email-content-display .yahoo_quoted,
+    .email-content-display .moz-cite-prefix {
+      border-left: 3px solid #ccc;
+      padding-left: 15px;
+      margin: 15px 0;
+      color: #666;
+      font-style: italic;
+    }
+
+    .email-content-display .gmail_signature {
+      border-top: 1px solid #e0e0e0;
+      padding-top: 15px;
+      margin-top: 20px;
+      color: #666;
+      font-size: 13px;
+    }
+
+    .email-content-display strong,
+    .email-content-display b {
+      font-weight: 600;
+    }
+
+    .email-content-display em,
+    .email-content-display i {
+      font-style: italic;
+    }
+
+    .email-content-display {
+      overflow-x: hidden !important;
+      overflow-y: auto;
+    }
+
+    .email-content-display * {
+      overflow-wrap: break-word !important;
+      word-wrap: break-word !important;
+      word-break: break-word !important;
+    }
+
+    .email-content-display img[src=""],
+    .email-content-display img:not([src]) {
+      display: none;
+    }
+  `;
+
+  // Inject styles when component mounts
+  useEffect(() => {
+    const styleSheet = document.createElement('style');
+    styleSheet.id = 'email-content-display-styles';
+    styleSheet.textContent = emailContentStyles;
+    
+    const existingStyles = document.getElementById('email-content-display-styles');
+    if (existingStyles) {
+      document.head.removeChild(existingStyles);
+    }
+    
+    document.head.appendChild(styleSheet);
+    
+    return () => {
+      if (document.head.contains(styleSheet)) {
+        document.head.removeChild(styleSheet);
+      }
+    };
+  }, []);
 
   // Reset summary when email changes
   useEffect(() => {
     setSummary(null);
     setReminderCreated(false);
-    setShowImages(false);
+    setShowImages(true);
   }, [email?.id]);
 
-  // Process email content when email changes or showImages toggles
+  // Process email content when email changes
   useEffect(() => {
     if (email?.body) {
-      setProcessedContent(processEmailContent(email.body, showImages));
+      setProcessedContent(processEmailContent(email.body));
     }
   }, [email?.body, showImages]);
 
@@ -70,256 +304,100 @@ export const EmailViewer: React.FC<EmailViewerProps> = ({
     return () => document.removeEventListener('keydown', handleKeyPress);
   }, [email, onGenerateSummary, onCreateReminder, showImages]);
 
-  const processEmailContent = (body: string, loadImages: boolean): string => {
+  // Handle link clicks
+  useEffect(() => {
+    const handleLinkClick = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'A') {
+        e.preventDefault();
+        const href = target.getAttribute('href');
+        if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:'))) {
+          window.open(href, '_blank', 'noopener,noreferrer');
+        }
+      }
+    };
+
+    const contentElement = contentRef.current;
+    if (contentElement) {
+      contentElement.addEventListener('click', handleLinkClick);
+      return () => {
+        contentElement.removeEventListener('click', handleLinkClick);
+      };
+    }
+  }, [processedContent]);
+
+  const processEmailContent = (body: string): string => {
+    if (!body) return '<p>No content available</p>';
+
     let content = body;
 
-    // First, preserve existing HTML structure and formatting
-    // Don't aggressively remove whitespace that might be important for formatting
+    // Remove potentially dangerous elements
     content = content
-      .replace(/\r\n/g, '\n')
-      .replace(/\n{3,}/g, '\n\n') // Only collapse excessive line breaks (3+)
-      .trim();
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/javascript:/gi, '')
+      .replace(/on\w+\s*=/gi, '');
 
-    // Preserve indentation by converting spaces to non-breaking spaces in certain contexts
-    content = content.replace(/^( {2,})/gm, (match) => {
-      return match.replace(/ /g, '&nbsp;');
-    });
+    // Fix malformed HTML entities
+    content = content.replace(/&(?!amp;|lt;|gt;|quot;|#\d+;|#x[0-9a-f]+;)/gi, '&amp;');
 
-    // Handle preformatted text and code blocks
-    content = content.replace(/<pre([^>]*)>([\s\S]*?)<\/pre>/gi, ( attrs, innerContent) => {
-      // Preserve all whitespace in pre tags
-      return `<pre${attrs} class="bg-gray-100 p-3 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre">${innerContent}</pre>`;
-    });
-
-    // Handle code tags
-    content = content.replace(/<code([^>]*)>([\s\S]*?)<\/code>/gi, ( attrs, innerContent) => {
-      return `<code${attrs} class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">${innerContent}</code>`;
-    });
-
-    // Handle blockquotes
-    content = content.replace(/<blockquote([^>]*)>([\s\S]*?)<\/blockquote>/gi, ( attrs, innerContent) => {
-      return `<blockquote${attrs} class="border-l-4 border-gray-300 pl-4 my-4 text-gray-700 italic">${innerContent}</blockquote>`;
-    });
-
-    // Handle lists with proper styling
-    content = content.replace(/<ul([^>]*)>/gi, '<ul$1 class="list-disc list-inside my-4 space-y-1">');
-    content = content.replace(/<ol([^>]*)>/gi, '<ol$1 class="list-decimal list-inside my-4 space-y-1">');
-    content = content.replace(/<li([^>]*)>/gi, '<li$1 class="ml-4">');
-
-    // Handle tables
-    content = content.replace(/<table([^>]*)>/gi, '<div class="overflow-x-auto my-4"><table$1 class="min-w-full border border-gray-200 rounded-lg">');
-    content = content.replace(/<\/table>/gi, '</table></div>');
-    content = content.replace(/<th([^>]*)>/gi, '<th$1 class="px-4 py-2 bg-gray-100 border-b border-gray-200 text-left font-semibold">');
-    content = content.replace(/<td([^>]*)>/gi, '<td$1 class="px-4 py-2 border-b border-gray-200">');
-
-    // Handle paragraphs with proper spacing
-    content = content.replace(/<p([^>]*)>/gi, '<p$1 class="my-3 leading-relaxed">');
-
-    // Handle divs that might contain important spacing
-    content = content.replace(/<div([^>]*?)style=["']([^"']*?)["']([^>]*)>/gi, ( beforeStyle, styleContent, afterStyle) => {
-      // Preserve important styling like margins, padding, text-align
-      const preservedStyles = styleContent
-        .split(';')
-        .filter((style:any) => {
-          const prop = style.trim().split(':')[0]?.toLowerCase();
-          return ['margin', 'padding', 'text-align', 'text-indent', 'white-space', 'display'].some(p => prop?.includes(p));
-        })
-        .join(';');
-      
-      return preservedStyles 
-        ? `<div${beforeStyle} style="${preservedStyles}"${afterStyle}>`
-        : `<div${beforeStyle}${afterStyle}>`;
-    });
-
-    // Handle URLs (but avoid breaking existing links)
+    // Enhance all links to open in new tabs
     content = content.replace(
-      /(?<!href=["'])https?:\/\/[^\s\n<>"']+(?!["'][^>]*>)/g, 
-      (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all">${url}</a>`
+      /<a\s+([^>]*?)href\s*=\s*["']([^"']+)["']([^>]*?)>/gi,
+      (match, before, href, after) => {
+        if (!after.includes('target=')) {
+          return `<a ${before}href="${href}" target="_blank" rel="noopener noreferrer"${after}>`;
+        }
+        return match;
+      }
     );
 
-    // Handle iframes with different content types
-    if (loadImages) {
+    // Handle images based on showImages setting
+    if (!showImages) {
+      let imageCount = 0;
       content = content.replace(
-        /<iframe([^>]*?)src=["']([^"']*?)["']([^>]*?)>/gi,
-        ( beforeSrc, src, afterSrc) => {
-          // Determine iframe type and styling
-          const isVideo = src.includes('youtube') || src.includes('vimeo') || src.includes('video');
-          const isMap = src.includes('maps.google') || src.includes('openstreetmap') || src.includes('mapbox');
-          const isForm = src.includes('forms.') || src.includes('typeform') || src.includes('survey');
-          const isSocial = src.includes('twitter') || src.includes('facebook') || src.includes('instagram') || src.includes('linkedin');
+        /<img([^>]*?)>/gi,
+        (match) => {
+          imageCount++;
+          const altMatch = match.match(/alt=["']([^"']*?)["']/i);
+          const altText = altMatch ? altMatch[1] : `Image ${imageCount}`;
           
-          let containerClass = 'my-4 rounded-lg border border-gray-200 overflow-hidden';
-          let iframeClass = 'w-full border-0';
-          let height = '400px';
-          
-          if (isVideo) {
-            containerClass += ' aspect-video';
-            iframeClass += ' h-full';
-            height = 'auto';
-          } else if (isMap) {
-            height = '300px';
-          } else if (isForm) {
-            height = '600px';
-          } else if (isSocial) {
-            height = '500px';
-          }
-          
-    
-          const trustedDomains = [
-            'youtube.com', 'youtu.be', 'vimeo.com',
-            'google.com', 'maps.google.com',
-            'openstreetmap.org', 'mapbox.com',
-            'forms.gle', 'docs.google.com',
-            'typeform.com', 'surveymonkey.com',
-            'twitter.com', 'facebook.com',
-            'linkedin.com', 'instagram.com'
-          ];
-          
-          const isTrusted = trustedDomains.some(domain => src.includes(domain));
-          
-          if (!isTrusted) {
-            return `<div class="flex items-center gap-3 p-4 my-4 bg-yellow-50 border-2 border-dashed border-yellow-300 rounded-lg">
-              <div class="flex-shrink-0 p-2 bg-yellow-200 rounded-lg">
-                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                </svg>
-              </div>
-              <div class="flex-1">
-                <p class="text-sm font-medium text-yellow-800">Embedded content blocked</p>
-                <p class="text-xs text-yellow-700 mt-1">Untrusted domain: ${new URL(src).hostname}</p>
-                <a href="${src}" target="_blank" rel="noopener noreferrer" class="text-xs text-yellow-600 hover:text-yellow-800 underline mt-2 inline-block">
-                  Open in new tab →
-                </a>
-              </div>
-            </div>`;
-          }
-          
-          return `<div class="${containerClass}">
-            <iframe${beforeSrc}
-              src="${src}"${afterSrc}
-              class="${iframeClass}"
-              style="height: ${height};"
-              loading="lazy"
-              allowfullscreen
-              sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"
-              onerror="this.parentElement.innerHTML='<div class=\\"flex items-center gap-2 p-4 text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg\\"><svg class=\\"w-4 h-4\\" fill=\\"none\\" stroke=\\"currentColor\\" viewBox=\\"0 0 24 24\\"><path stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\" stroke-width=\\"2\\" d=\\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\\"></path></svg>Failed to load embedded content</div>'"
-            ></iframe>
+          return `<div style="display: flex; align-items: center; gap: 12px; padding: 12px; margin: 12px 0; background-color: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 8px; min-height: 80px;">
+            <div style="flex-shrink: 0; padding: 8px; background-color: #e9ecef; border-radius: 6px;">
+              <svg style="width: 24px; height: 24px; color: #6c757d;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <p style="margin: 0; font-size: 14px; font-weight: 500; color: #495057;">Image blocked for privacy</p>
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: #6c757d;">${altText}</p>
+            </div>
           </div>`;
         }
       );
     } else {
-      // Replace iframes with informative placeholders
-      let iframeCount = 0;
+      // Process images for loading
       content = content.replace(
-        /<iframe[^>]*?src=["']([^"']*?)["'][^>]*?>/gi,
-        ( src) => {
-          iframeCount++;
-          
-          // Determine content type for better placeholder
-          const isVideo = src.includes('youtube') || src.includes('vimeo') || src.includes('video');
-          const isMap = src.includes('maps.google') || src.includes('openstreetmap') || src.includes('mapbox');
-          const isForm = src.includes('forms.') || src.includes('typeform') || src.includes('survey');
-          const isSocial = src.includes('twitter') || src.includes('facebook') || src.includes('instagram');
-          
-          let contentType = 'Embedded content';
-          let icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>`;
-          
-          if (isVideo) {
-            contentType = 'Video';
-            icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15M9 10V9a2 2 0 012-2h2a2 2 0 012 2v1M9 10v5a2 2 0 002 2h2a2 2 0 002-2v-5"></path>`;
-          } else if (isMap) {
-            contentType = 'Map';
-            icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>`;
-          } else if (isForm) {
-            contentType = 'Form';
-            icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>`;
-          } else if (isSocial) {
-            contentType = 'Social media post';
-            icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>`;
-          }
-          
-          return `<div class="flex items-center gap-3 p-4 my-4 bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg min-h-[200px]">
-            <div class="flex-shrink-0 p-3 bg-blue-200 rounded-lg">
-              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                ${icon}
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-blue-800">${contentType} blocked</p>
-              <p class="text-xs text-blue-600 mt-1">${new URL(src).hostname}</p>
-              <div class="mt-3 space-y-2">
-                <button 
-                  onclick="document.querySelector('[data-toggle-images]').click()" 
-                  class="text-xs text-blue-600 hover:text-blue-800 underline block"
-                >
-                  Click "Show Images" to load embedded content
-                </button>
-                <a href="${src}" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-600 hover:text-blue-800 underline block">
-                  Open in new tab →
-                </a>
-              </div>
-            </div>
-          </div>`;
+        /<img([^>]*?)>/gi,
+        (match) => {
+          return match.replace(/<img/, '<img style="max-width: 100%; height: auto; border-radius: 4px; margin: 8px 0;"');
         }
       );
     }
 
-    // Handle images (after iframes to avoid conflicts)
-    if (loadImages) {
-      // Enable images with proper styling and error handling
+    // Handle iframes
+    if (!showImages) {
       content = content.replace(
-        /<img([^>]*?)src=["']([^"']*?)["']([^>]*?)>/gi,
-        ( beforeSrc, src, afterSrc) => {
-          // Check if it's a data URL or external URL
-          const isDataUrl = src.startsWith('data:');
-          const isBlockedSrc = src.includes('tracking') || src.includes('pixel') || src.includes('beacon');
-          
-          if (isBlockedSrc && !isDataUrl) {
-            return `<div class="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-500 bg-gray-100 border border-gray-200 rounded-lg my-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636 5.636 18.364"></path>
-              </svg>
-              Blocked tracking image
-            </div>`;
-          }
-
-          return `<div class="my-4 max-w-full">
-            <img${beforeSrc}
-              src="${src}"${afterSrc}
-              class="max-w-full h-auto rounded-lg shadow-sm border border-gray-200"
-              style="max-height: 400px; width: auto;"
-              loading="lazy"
-              onerror="this.parentElement.innerHTML='<div class=\\"inline-flex items-center gap-2 px-3 py-2 text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg\\"><svg class=\\"w-4 h-4\\" fill=\\"none\\" stroke=\\"currentColor\\" viewBox=\\"0 0 24 24\\"><path stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\" stroke-width=\\"2\\" d=\\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\\"></path></svg>Failed to load image</div>'"
-            />
-          </div>`;
-        }
-      );
-    } else {
-      // Replace images with placeholders that maintain consistent spacing
-      let imageCount = 0;
-      content = content.replace(
-        /<img[^>]*?>/gi,
-        (match) => {
-          imageCount++;
-          // Extract alt text if available
-          const altMatch = match.match(/alt=["']([^"']*?)["']/i);
-          const altText = altMatch ? altMatch[1] : `Image ${imageCount}`;
-          
-          return `<div class="flex items-center gap-3 p-4 my-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg min-h-[120px]">
-            <div class="flex-shrink-0 p-3 bg-gray-200 rounded-lg">
-              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        /<iframe([^>]*?)>/gi,
+        () => {
+          return `<div style="display: flex; align-items: center; gap: 12px; padding: 16px; margin: 16px 0; background-color: #e3f2fd; border: 2px dashed #90caf9; border-radius: 8px; min-height: 120px;">
+            <div style="flex-shrink: 0; padding: 12px; background-color: #bbdefb; border-radius: 6px;">
+              <svg style="width: 32px; height: 32px; color: #1976d2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
               </svg>
             </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-700">Image blocked for privacy</p>
-              <p class="text-xs text-gray-500 mt-1">${altText}</p>
-              <button 
-                onclick="document.querySelector('[data-toggle-images]').click()" 
-                class="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
-              >
-                Click "Show Images" to load
-              </button>
+            <div style="flex: 1; min-width: 0;">
+              <p style="margin: 0; font-size: 14px; font-weight: 500; color: #1565c0;">Embedded content blocked</p>
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: #1976d2;">Click "Show Content" to load embedded media</p>
             </div>
           </div>`;
         }
@@ -465,7 +543,7 @@ export const EmailViewer: React.FC<EmailViewerProps> = ({
   const imageCount = countImages(email.body || '');
 
   return (
-    <div className="flex flex-col flex-1 h-full bg-white">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
       <div className="p-6 border-b border-gray-200 bg-gray-50">
         <div className="flex items-start justify-between mb-4">
@@ -504,7 +582,6 @@ export const EmailViewer: React.FC<EmailViewerProps> = ({
             {imageCount > 0 && (
               <button
                 onClick={() => setShowImages(!showImages)}
-                data-toggle-images
                 className={`inline-flex items-center gap-2 px-4 py-2 transition-colors duration-200 border rounded-lg ${
                   showImages 
                     ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100' 
@@ -610,13 +687,9 @@ export const EmailViewer: React.FC<EmailViewerProps> = ({
         <div className="max-w-none">
           <div 
             ref={contentRef}
-            className="leading-relaxed prose text-gray-800 prose-blue max-w-none"
-            style={{ 
-              wordBreak: 'break-word',
-              whiteSpace: 'pre-wrap' // This preserves whitespace and line breaks
-            }}
+            className="email-content-display"
             dangerouslySetInnerHTML={{ 
-              __html: processedContent || email.snippet || 'No content available' 
+              __html: processedContent || email.snippet || '<p>No content available</p>' 
             }}
           />
         </div>
