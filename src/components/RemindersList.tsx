@@ -62,7 +62,7 @@ export const RemindersList: React.FC<RemindersListProps> = ({
         {!isCompleted && (
           <button
             onClick={() => onCompleteReminder(reminder.id)}
-            className="text-sm text-gray-500 hover:text-green-600 transition-colors duration-200"
+            className="text-sm text-gray-500 transition-colors duration-200 hover:text-green-600"
           >
             Mark Complete
           </button>
@@ -107,10 +107,10 @@ export const RemindersList: React.FC<RemindersListProps> = ({
   );
 
   return (
-    <div className="flex-1 bg-white p-6 overflow-y-auto">
+    <div className="flex-1 p-6 overflow-y-auto bg-white">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Email Reminders</h1>
+          <h1 className="mb-2 text-2xl font-semibold text-gray-900">Email Reminders</h1>
           <p className="text-gray-600">
             {activeReminders.length} active reminders, {completedReminders.length} completed
           </p>
@@ -118,7 +118,7 @@ export const RemindersList: React.FC<RemindersListProps> = ({
 
         {activeReminders.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Active Reminders</h2>
+            <h2 className="mb-4 text-lg font-medium text-gray-900">Active Reminders</h2>
             <div className="space-y-4">
               {activeReminders
                 .sort((a, b) => new Date(a.remind_at).getTime() - new Date(b.remind_at).getTime())
@@ -131,11 +131,11 @@ export const RemindersList: React.FC<RemindersListProps> = ({
 
         {completedReminders.length > 0 && (
           <div>
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Completed</h2>
+            <h2 className="mb-4 text-lg font-medium text-gray-900">Completed</h2>
             <div className="space-y-4">
               {completedReminders
                 .sort((a, b) => new Date(b.remind_at).getTime() - new Date(a.remind_at).getTime())
-                .slice(0, 10) // Show only last 10 completed
+                .slice(0, 10) 
                 .map(reminder => (
                   <ReminderCard key={reminder.id} reminder={reminder} isCompleted />
                 ))}
@@ -144,9 +144,9 @@ export const RemindersList: React.FC<RemindersListProps> = ({
         )}
 
         {activeReminders.length === 0 && completedReminders.length === 0 && (
-          <div className="text-center text-gray-500 mt-12">
+          <div className="mt-12 text-center text-gray-500">
             <Clock className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <p className="text-lg mb-2">No reminders yet</p>
+            <p className="mb-2 text-lg">No reminders yet</p>
             <p className="text-sm">Set reminders for important emails to stay organized</p>
           </div>
         )}

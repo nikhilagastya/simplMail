@@ -164,7 +164,7 @@ export const EmailViewer: React.FC<EmailViewerProps> = ({
             height = '500px';
           }
           
-          // Security check for trusted domains
+    
           const trustedDomains = [
             'youtube.com', 'youtu.be', 'vimeo.com',
             'google.com', 'maps.google.com',

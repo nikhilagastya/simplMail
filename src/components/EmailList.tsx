@@ -6,7 +6,6 @@ interface EmailListProps {
   selectedIndex: number;
   onSelectEmail: (index: number) => void;
   reminders?: any[];
-  // Pagination props
   hasMoreEmails: boolean;
   isLoadingEmails: boolean;
   onLoadMore: () => void;
@@ -34,7 +33,7 @@ export const EmailList: React.FC<EmailListProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Intersection Observer for infinite scroll
+  
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -61,7 +60,6 @@ export const EmailList: React.FC<EmailListProps> = ({
     };
   }, [hasMoreEmails, isLoadingEmails, onLoadMore]);
 
-  // Scroll to selected email
   useEffect(() => {
     if (scrollContainerRef.current) {
       const selectedElement = scrollContainerRef.current.children[selectedIndex] as HTMLElement;
@@ -93,7 +91,6 @@ export const EmailList: React.FC<EmailListProps> = ({
   };
 
   const extractSenderName = (from: string) => {
-    // Extract name before < or use full email if no name
     const match = from.match(/^(.*?)\s*<.*>$/) || from.match(/^(.+)$/);
     return match ? match[1].trim() : from;
   };
@@ -103,7 +100,7 @@ export const EmailList: React.FC<EmailListProps> = ({
 
   return (
     <div className="flex flex-col h-full overflow-y-auto border-r border-gray-200 w-80 bg-gray-50">
-      {/* Header with pagination info and refresh button */}
+    
       <div className="p-4 bg-white border-b border-gray-200">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-lg font-semibold text-gray-900">Inbox</h2>

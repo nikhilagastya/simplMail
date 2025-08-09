@@ -28,7 +28,7 @@ function App() {
     const geminiService = new GeminiService(geminiApiKey);
     const emailsPerPage = 30;
 
-    // Load emails and reminders
+  
     useEffect(() => {
         if (isAuthenticated && accessToken && providerToken) {
             fetchEmails(providerToken);
@@ -36,7 +36,6 @@ function App() {
         }
     }, [isAuthenticated, accessToken]);
 
-    // Keyboard navigation
     useKeyboardNavigation({
         onArrowUp: () => {
             if (activeView === 'inbox') {
@@ -245,7 +244,6 @@ function App() {
                         selectedIndex={selectedEmailIndex}
                         onSelectEmail={setSelectedEmailIndex}
                         reminders={reminders}
-                        // Pagination props
                         hasMoreEmails={hasMoreEmails}
                         isLoadingEmails={isLoadingEmails}
                         onLoadMore={loadMoreEmails}

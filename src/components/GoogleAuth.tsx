@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { LogIn, Mail } from 'lucide-react';
-import { supabase } from '../lib/supabase'; // make sure this is properly initialized
+import { supabase } from '../lib/supabase'; 
 
 interface GoogleAuthProps {
   onAuthSuccess: (accessToken: string,providerToken:string, refreshToken: string | undefined, email: string) => void;
@@ -10,7 +10,7 @@ export const GoogleAuth: React.FC<GoogleAuthProps> = ({ onAuthSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Handle OAuth redirect and extract session
+
   useEffect(() => {
     const handleOAuthRedirect = async () => {
       const {
@@ -68,7 +68,7 @@ export const GoogleAuth: React.FC<GoogleAuthProps> = ({ onAuthSuccess }) => {
         setIsLoading(false);
       }
 
-      // Redirect will happen here automatically, so no need to reset loading
+     
     } catch (err) {
       console.error('Unexpected error:', err);
       setError('Something went wrong. Please try again.');

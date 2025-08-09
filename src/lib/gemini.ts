@@ -84,7 +84,7 @@ export class GeminiService {
   }
 
   private getFallbackSummary(emailContent: string, subject: string): EmailSummary {
-    // Generate a simple fallback summary based on content analysis
+  
     const wordCount = emailContent.split(' ').length;
     const hasUrgentKeywords = /urgent|asap|deadline|important|critical/i.test(emailContent + ' ' + subject);
     const hasActionKeywords = /please|need|should|must|action|review|complete/i.test(emailContent);
